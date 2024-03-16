@@ -28,19 +28,17 @@ public class FtpServer {
             DataInputStream inputStream = new DataInputStream(socket.getInputStream());
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            do {
-                String message_in = inputStream.readUTF();
-                System.out.println(message_in);
-
-                System.out.println(user_name + ": ");
-                String message_out = scanner.nextLine().trim();
-                message_out = user_name + ": " + message_out;
-                outputStream.writeUTF(message_out);
-
-            }while(true);
+            while (true){
+                String input = inputStream.readUTF(); // get client request
+                commandRouter(input); // TODO: parse input - send to method
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void commandRouter(String input) {
+
     }
 }

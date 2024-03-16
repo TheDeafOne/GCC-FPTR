@@ -22,9 +22,6 @@ public class FtpClient {
     //public static final String HOST = "10.37.106.205";
 
     public static void main(String[] args) {
-
-        System.out.println("Welcome to GCC Chatting Room");
-        System.out.println("Please enter your name");
         Scanner scanner = new Scanner(System.in);
         String user_name = scanner.nextLine().trim();
 
@@ -36,12 +33,10 @@ public class FtpClient {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
             while (true) {
-                System.out.println(user_name + ": ");
-                String message = scanner.nextLine().trim();
-                message = user_name + ": " + message;
-                outputStream.writeUTF(message);
-                String response = inputStream.readUTF();
-                System.out.println(response);
+                String message = scanner.nextLine().trim(); // get user input (command)
+                outputStream.writeUTF(message); // pass to server
+                String response = inputStream.readUTF(); // TODO get response - possibly initial to determine what to do, then another response to actually do that
+                System.out.println(response); // TODO: parse response
             }
 
         } catch (IOException e) {
