@@ -38,7 +38,9 @@ public class FtpServer {
         }
     }
 
-    private static void commandRouter(String input) {
-
+    private static void commandRouter(String command) {
+        if (command.equals("GET")) {
+            System.out.println("do something");
+        }
     }
 }
