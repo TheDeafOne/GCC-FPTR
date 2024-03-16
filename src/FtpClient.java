@@ -1,3 +1,8 @@
+/** Author:  Brayden Stuchell, Keegan Woodburn
+ * Course:  COMP 342 Data Communications and Networking
+ * Date:    16 March 2022
+ * Description: put a description here
+ */
 
 import java.io.FileWriter;
 import java.io.IOException;
