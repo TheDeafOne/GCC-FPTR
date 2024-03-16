@@ -13,24 +13,39 @@ import java.util.Scanner;
 
 public class FtpServer {
     public static final int PORT = 9001;
+    static DataInputStream inputStream;
+    static DataOutputStream outputStream;
 
     public static void main(String[] args) {
-
-        Scanner scanner = new Scanner(System.in);
-        String user_name = scanner.nextLine().trim();
-
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
             System.out.println("Server is listening to " + PORT);
             Socket socket = serverSocket.accept();
             System.out.println("Connected: socket " + socket);
 
-            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            inputStream = new DataInputStream(socket.getInputStream());
+            outputStream = new DataOutputStream(socket.getOutputStream());
 
             while (true){
-                String input = inputStream.readUTF(); // get client request
-                commandRouter(input); // TODO: parse input - send to method
+                String[] input = inputStream.readUTF().split(" "); // get client request
+                String command = input[0], data = input.length > 1 ? input[1] : "";
+                switch (command) {
+                    case "GET":
+                        GET(data);
+                        break;
+                    case "PUT":
+                        PUT();
+                        break;
+                    case "LS":
+                        LS();
+                        break;
+                    case "PWD":
+                        PWD();
+                        break;
+                    case "QUIT":
+                        //TODO: say goodbye or something
+                        return;
+                }
             }
 
         } catch (IOException e) {
@@ -38,9 +53,21 @@ public class FtpServer {
         }
     }
 
-    private static void commandRouter(String command) {
-        if (command.equals("GET")) {
-            System.out.println("do something");
-        }
+    private static void PUT() {
+
     }
+
+    private static void GET(String data) {
+
+    }
+
+    private static void PWD() {
+
+    }
+
+    private static void LS() {
+
+    }
+
+
 }
