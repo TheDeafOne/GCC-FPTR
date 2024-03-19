@@ -19,28 +19,65 @@ public class FtpClient {
     public static final int PORT = 9001;
 
     public static final String HOST = "127.0.0.1";
-    //public static final String HOST = "10.37.106.205";
+    private static final String clientDirectory = "./client_folder/";
+    private static final String ack = "ACK";
+
+    private static DataInputStream inputStream;
+    private static DataOutputStream outputStream;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String user_name = scanner.nextLine().trim();
-
         try {
             Socket socket = new Socket(HOST, PORT);
             System.out.println("Succeed: socket: " + socket);
 
-            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            inputStream = new DataInputStream(socket.getInputStream());
+            outputStream = new DataOutputStream(socket.getOutputStream());
 
             while (true) {
-                String message = scanner.nextLine().trim(); // get user input (command)
-                outputStream.writeUTF(message); // pass to server
-                String response = inputStream.readUTF(); // TODO get response - possibly initial to determine what to do, then another response to actually do that
-                System.out.println(response); // TODO: parse response
-            }
+                // get user command
+                String message = scanner.nextLine().trim();
+                String[] input = inputStream.readUTF().split(" ");
+                String command = input[0], data = input.length > 1 ? input[1] : "";
 
+                // pass to server and parse ack
+                outputStream.writeUTF(message);
+
+                // route command to get client to send proper data
+                switch (command) {
+                    case "GET" -> GET(data);
+                    case "PUT" -> PUT(data);
+                    case "LS" -> LS();
+                    case "PWD" -> PWD();
+                    case "QUIT" -> {
+                        inputStream.close();
+                        outputStream.close();
+                        return;
+                    }
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private static void PUT(String filename) throws IOException {
+        byte[] fileBytes = Files.readAllBytes(Path.of(clientDirectory + filename));
+        outputStream.writeUTF(filename); // send filename
+        outputStream.writeInt(fileBytes.length); // send file byte array length
+        outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
+    }
+
+    private static void GET(String data) {
+
+    }
+
+    private static void PWD() {
+
+    }
+
+    private static void LS() {
+
+    }
+
 }

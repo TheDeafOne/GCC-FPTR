@@ -6,10 +6,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Scanner;
 
 public class FtpServer {
     public static final int PORT = 9001;
@@ -30,21 +26,14 @@ public class FtpServer {
                 String[] input = inputStream.readUTF().split(" "); // get client request
                 String command = input[0], data = input.length > 1 ? input[1] : "";
                 switch (command) {
-                    case "GET":
-                        GET(data);
-                        break;
-                    case "PUT":
-                        PUT();
-                        break;
-                    case "LS":
-                        LS();
-                        break;
-                    case "PWD":
-                        PWD();
-                        break;
-                    case "QUIT":
+                    case "GET" -> GET(data);
+                    case "PUT" -> PUT();
+                    case "LS" -> LS();
+                    case "PWD" -> PWD();
+                    case "QUIT" -> {
                         //TODO: say goodbye or something
                         return;
+                    }
                 }
             }
 
@@ -53,11 +42,19 @@ public class FtpServer {
         }
     }
 
-    private static void PUT() {
-
+    private static void PUT()  throws IOException {
+        String filename = inputStream.readUTF();
+        int n = inputStream.readInt();
+        byte[] fileBytes = Utils.readBytes(inputStream, n);
+        try (FileOutputStream fos = new FileOutputStream(filename)) {
+            fos.write(fileBytes);
+        } catch (Exception e) {
+            System.out.println("There was an error");
+        }
+        outputStream.writeUTF("ACK");
     }
 
-    private static void GET(String data) {
+    private static void GET(String filename) {
 
     }
 
