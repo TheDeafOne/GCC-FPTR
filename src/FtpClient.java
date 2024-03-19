@@ -4,16 +4,13 @@
  * Description: put a description here
  */
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 public class FtpClient {
     public static final int PORT = 9001;
@@ -65,8 +62,15 @@ public class FtpClient {
         outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
     }
 
-    private static void GET(String data) {
-
+    private static void GET(String data) throws IOException {
+        int n = inputStream.readInt();
+        byte[] fileBytes = Utils.readBytes(inputStream, n);
+        try (FileOutputStream fos = new FileOutputStream(data)) {
+            fos.write(fileBytes);
+        } catch (Exception e) {
+            System.out.println("There was an error");
+        }
+        outputStream.writeUTF("ACK");
     }
 
     private static void PWD() {
