@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -21,7 +22,7 @@ public class FtpServer {
     public static final int PORT = 9001;
     static DataInputStream inputStream;
     static DataOutputStream outputStream;
-    public static  String currentDirectory = System.getProperty("user.dir");
+    public static  String currentDirectory = System.getProperty("user.dir") + "/server_folder/";
 
     public static void main(String[] args) {
         try {
@@ -46,6 +47,7 @@ public class FtpServer {
                         return;
                     }
                 }
+                System.out.println();
             }
 
         } catch (IOException e) {
@@ -73,11 +75,16 @@ public class FtpServer {
 
     }
 
-    private static Set<String> LS(String dir) {
-        return Stream.of(new File(dir).listFiles())
+    private static void LS(String dir) throws IOException {
+        List<String> filenames = Stream.of(new File(dir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
-                .collect(Collectors.toSet());
+                .toList();
+        outputStream.writeInt(filenames.size());
+        for (String filename : filenames) {
+            outputStream.writeUTF(filename);
+        }
+
     }
 
 

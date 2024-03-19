@@ -26,22 +26,19 @@ public class FtpClient {
     private static DataOutputStream outputStream;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scnr = new Scanner(System.in);
         try {
             Socket socket = new Socket(HOST, PORT);
-            System.out.println("Succeed: socket: " + socket);
+            System.out.println("Welcome to GCC FTP client!");
 
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
-
             while (true) {
                 // get user command
-                String message = scanner.nextLine().trim();
-                String[] input = inputStream.readUTF().split(" ");
-                String command = input[0], data = input.length > 1 ? input[1] : "";
-
-                // pass to server and parse ack
-                outputStream.writeUTF(message);
+                System.out.print("command: ");
+                String message = scnr.nextLine().trim();
+                String[] input = message.split(" ");
+                String command = input[0], data = input.length > 2 ? input[1] : "";
 
                 // route command to get client to send proper data
                 switch (command) {
@@ -76,8 +73,12 @@ public class FtpClient {
 
     }
 
-    private static void LS() {
-
+    private static void LS() throws IOException {
+        outputStream.writeUTF("LS");
+        int n = inputStream.readInt();
+        for (int i = 0; i < n; i++) {
+            System.out.println(inputStream.readUTF());
+        }
     }
 
 }
