@@ -44,7 +44,9 @@ public class FtpServer {
                     case "LS" -> LS(currentDirectory);
                     case "PWD" -> PWD();
                     case "QUIT" -> {
-                        //TODO: say goodbye or something
+                        outputStream.close();
+                        inputStream.close();
+                        System.out.println("Connection to the client terminated...");
                         return;
                     }
                 }
