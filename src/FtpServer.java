@@ -6,18 +6,29 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class FtpServer {
     public static final int PORT = 9001;
     static DataInputStream inputStream;
     static DataOutputStream outputStream;
+    public static  String currentDirectory = System.getProperty("user.dir");
 
     public static void main(String[] args) {
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);
-            System.out.println("Server is listening to " + PORT);
+            System.out.println("Welcome to GCC FTP Service!");
             Socket socket = serverSocket.accept();
-            System.out.println("Connected: socket " + socket);
+            System.out.println("Waiting for client commands...");
 
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
@@ -28,7 +39,7 @@ public class FtpServer {
                 switch (command) {
                     case "GET" -> GET(data);
                     case "PUT" -> PUT();
-                    case "LS" -> LS();
+                    case "LS" -> LS(currentDirectory);
                     case "PWD" -> PWD();
                     case "QUIT" -> {
                         //TODO: say goodbye or something
@@ -62,8 +73,11 @@ public class FtpServer {
 
     }
 
-    private static void LS() {
-
+    private static Set<String> LS(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
     }
 
 
