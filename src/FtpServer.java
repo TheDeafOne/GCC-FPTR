@@ -32,7 +32,8 @@ public class FtpServer {
             outputStream = new DataOutputStream(socket.getOutputStream());
 
             while (true){
-                String[] input = inputStream.readUTF().split(" "); // get client request
+                String message = inputStream.readUTF();
+                String[] input = message.split(" "); // get client request
                 String command = input[0], data = input.length > 1 ? input[1] : "";
                 switch (command) {
                     case "GET" -> GET(data);
@@ -40,11 +41,13 @@ public class FtpServer {
                     case "LS" -> LS(currentDirectory);
                     case "PWD" -> PWD();
                     case "QUIT" -> {
-                        //TODO: say goodbye or something
+                        outputStream.close();
+                        inputStream.close();
+                        System.out.println("Connection to the client terminated...");
                         return;
                     }
                 }
-                System.out.println();
+                System.out.println("\n");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -55,12 +58,11 @@ public class FtpServer {
         String filename = inputStream.readUTF();
         int n = inputStream.readInt();
         byte[] fileBytes = Utils.readBytes(inputStream, n);
-        try (FileOutputStream fos = new FileOutputStream(filename)) {
+        try (FileOutputStream fos = new FileOutputStream(currentDirectory + filename)) {
             fos.write(fileBytes);
         } catch (Exception e) {
             System.out.println("There was an error");
         }
-        outputStream.writeUTF("ACK");
     }
 
     private static void GET(String filename) throws Exception {
