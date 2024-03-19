@@ -4,22 +4,19 @@
  * Description: put a description here
  */
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 public class FtpClient {
     public static final int PORT = 9001;
 
     public static final String HOST = "127.0.0.1";
-    private static final String clientDirectory = "./client_folder/";
+    public static  String currentDirectory = System.getProperty("user.dir") + "/client_folder/";
     private static final String ack = "ACK";
 
     private static DataInputStream inputStream;
@@ -38,8 +35,8 @@ public class FtpClient {
                 System.out.print("command: ");
                 String message = scnr.nextLine().trim();
                 String[] input = message.split(" ");
-                String command = input[0], data = input.length > 2 ? input[1] : "";
-
+                String command = input[0], data = input.length > 1 ? input[1] : "";
+                outputStream.writeUTF(command);
                 // route command to get client to send proper data
                 switch (command) {
                     case "GET" -> GET(data);
@@ -59,10 +56,11 @@ public class FtpClient {
     }
 
     private static void PUT(String filename) throws IOException {
-        byte[] fileBytes = Files.readAllBytes(Path.of(clientDirectory + filename));
+        byte[] fileBytes = Files.readAllBytes(Path.of(currentDirectory + filename));
         outputStream.writeUTF(filename); // send filename
         outputStream.writeInt(fileBytes.length); // send file byte array length
         outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
+        System.out.println("Uploaded " + filename + " successfully");
     }
 
     private static void GET(String data) {
@@ -74,7 +72,6 @@ public class FtpClient {
     }
 
     private static void LS() throws IOException {
-        outputStream.writeUTF("LS");
         int n = inputStream.readInt();
         for (int i = 0; i < n; i++) {
             System.out.println(inputStream.readUTF());
