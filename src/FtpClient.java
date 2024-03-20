@@ -6,10 +6,8 @@
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class FtpClient {
@@ -36,7 +34,7 @@ public class FtpClient {
                 String message = scnr.nextLine().trim();
                 String[] input = message.split(" ");
                 String command = input[0], data = input.length > 1 ? input[1] : "";
-                outputStream.writeUTF(command);
+                outputStream.writeUTF(message);
                 // route command to get client to send proper data
                 switch (command) {
                     case "GET" -> GET(data);
@@ -49,6 +47,7 @@ public class FtpClient {
                         return;
                     }
                 }
+                System.out.println("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,8 +62,15 @@ public class FtpClient {
         System.out.println("Uploaded " + filename + " successfully");
     }
 
-    private static void GET(String data) {
-
+    private static void GET(String data) throws IOException {
+        int n = inputStream.readInt();
+        byte[] fileBytes = Utils.readBytes(inputStream, n);
+        try (FileOutputStream fos = new FileOutputStream(currentDirectory + data)) {
+            fos.write(fileBytes);
+        } catch (Exception e) {
+            System.out.println("There was an error");
+        }
+        System.out.println("Downloaded " + data + " correctly");
     }
 
     private static void PWD() throws IOException {

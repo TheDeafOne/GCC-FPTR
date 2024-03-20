@@ -6,17 +6,10 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
 public class FtpServer {
     public static final int PORT = 9001;
@@ -50,10 +43,8 @@ public class FtpServer {
                         return;
                     }
                 }
-                System.out.println("\n");
             }
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -69,7 +60,10 @@ public class FtpServer {
         }
     }
 
-    private static void GET(String filename) {
+    private static void GET(String filename) throws Exception {
+        byte[] fileBytes = Files.readAllBytes(Path.of(currentDirectory + filename));
+        outputStream.writeInt(fileBytes.length); // send file byte array length
+        outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
 
     }
 
@@ -78,7 +72,7 @@ public class FtpServer {
     }
 
     private static void LS(String dir) throws IOException {
-        List<String> filenames = Stream.of(new File(dir).listFiles())
+        List<String> filenames = Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .toList();
