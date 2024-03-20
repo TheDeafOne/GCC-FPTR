@@ -67,8 +67,9 @@ public class FtpClient {
 
     }
 
-    private static void PWD() {
-
+    private static void PWD() throws IOException {
+        String response = inputStream.readUTF();
+        System.out.println(response);
     }
 
     private static void LS() throws IOException {
