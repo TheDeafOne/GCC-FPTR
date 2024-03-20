@@ -29,7 +29,6 @@ public class FtpServer {
 
             while (true){
                 String message = inputStream.readUTF();
-                System.out.println(message);
                 String[] input = message.split(" "); // get client request
                 String command = input[0], data = input.length > 1 ? input[1] : "";
                 switch (command) {
@@ -44,7 +43,6 @@ public class FtpServer {
                         return;
                     }
                 }
-                System.out.println("\n");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,7 +61,6 @@ public class FtpServer {
     }
 
     private static void GET(String filename) throws Exception {
-        System.out.println(filename);
         byte[] fileBytes = Files.readAllBytes(Path.of(currentDirectory + filename));
         outputStream.writeInt(fileBytes.length); // send file byte array length
         outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
@@ -75,7 +72,6 @@ public class FtpServer {
     }
 
     private static void LS(String dir) throws IOException {
-        System.out.printf(dir);
         List<String> filenames = Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)

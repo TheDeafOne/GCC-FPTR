@@ -34,8 +34,6 @@ public class FtpClient {
                 String message = scnr.nextLine().trim();
                 String[] input = message.split(" ");
                 String command = input[0], data = input.length > 1 ? input[1] : "";
-                System.out.println(message);
-                System.out.println(data);
                 outputStream.writeUTF(message);
                 // route command to get client to send proper data
                 switch (command) {
@@ -49,6 +47,7 @@ public class FtpClient {
                         return;
                     }
                 }
+                System.out.println("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -71,7 +70,7 @@ public class FtpClient {
         } catch (Exception e) {
             System.out.println("There was an error");
         }
-        outputStream.writeUTF("ACK");
+        System.out.println("Downloaded " + data + " correctly");
     }
 
     private static void PWD() {
