@@ -15,7 +15,6 @@ public class FtpClient {
 
     public static final String HOST = "127.0.0.1";
     public static  String currentDirectory = System.getProperty("user.dir") + "/client_folder/";
-
     private static DataInputStream inputStream;
     private static DataOutputStream outputStream;
 
@@ -32,7 +31,8 @@ public class FtpClient {
                 System.out.print("command: ");
                 String message = scnr.nextLine().trim();
                 String[] input = message.split(" ");
-                String command = input[0], data = input.length > 1 ? input[1] : "";
+                String command = input[0].toUpperCase();
+                String data = input.length > 1 ? input[1] : "";
                 outputStream.writeUTF(message);
                 // route command to get client to send proper data
                 switch (command) {
@@ -46,22 +46,35 @@ public class FtpClient {
                         return;
                     }
                 }
-                System.out.println("\n");
+                System.out.println();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("There was an error with the server connection. Quitting the program...");
         }
     }
 
     private static void PUT(String filename) throws IOException {
-        byte[] fileBytes = Files.readAllBytes(Path.of(currentDirectory + filename));
-        outputStream.writeUTF(filename); // send filename
-        outputStream.writeInt(fileBytes.length); // send file byte array length
-        outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
-        System.out.println("Uploaded " + filename + " successfully");
+        try {
+            Path path = Path.of(currentDirectory + filename);
+            byte[] fileBytes = Files.readAllBytes(path);
+            outputStream.writeUTF(Utils.ACK);
+            outputStream.writeUTF(filename);
+            outputStream.writeInt(fileBytes.length); // send file byte array length
+            outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
+            System.out.println("Uploaded " + filename + " successfully");
+        } catch (Exception e) {
+            outputStream.writeUTF("Client Exception");
+            System.out.println("There was an error reading the file or the file does not exist.");
+        }
     }
 
     private static void GET(String data) throws IOException {
+        System.out.println(data);
+        String ack = inputStream.readUTF();
+        if (!ack.equals(Utils.ACK)) {
+            System.out.println("The file " + data + " does not exist.");
+            return;
+        }
         int n = inputStream.readInt();
         byte[] fileBytes = Utils.readBytes(inputStream, n);
         try (FileOutputStream fos = new FileOutputStream(currentDirectory + data)) {

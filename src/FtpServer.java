@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -30,7 +31,8 @@ public class FtpServer {
             while (true){
                 String message = inputStream.readUTF();
                 String[] input = message.split(" "); // get client request
-                String command = input[0], data = input.length > 1 ? input[1] : "";
+                String command = input[0].toUpperCase();
+                String data = input.length > 1 ? input[1] : "";
                 switch (command) {
                     case "GET" -> GET(data);
                     case "PUT" -> PUT();
@@ -45,11 +47,15 @@ public class FtpServer {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println("There was an error with the client connection. Quitting the program...");
         }
     }
 
     private static void PUT()  throws IOException {
+        String ack = inputStream.readUTF();
+        if (!ack.equals(Utils.ACK)) {
+            return; // clientside exception
+        }
         String filename = inputStream.readUTF();
         int n = inputStream.readInt();
         byte[] fileBytes = Utils.readBytes(inputStream, n);
@@ -61,9 +67,15 @@ public class FtpServer {
     }
 
     private static void GET(String filename) throws Exception {
-        byte[] fileBytes = Files.readAllBytes(Path.of(currentDirectory + filename));
-        outputStream.writeInt(fileBytes.length); // send file byte array length
-        outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
+        try {
+            Path path = Path.of(currentDirectory + filename);
+            byte[] fileBytes = Files.readAllBytes(path);
+            outputStream.writeUTF(Utils.ACK);
+            outputStream.writeInt(fileBytes.length); // send file byte array length
+            outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
+        } catch (Exception e) {
+            outputStream.writeUTF("There was an error reading the file or the file does not exist.");
+        }
 
     }
 
