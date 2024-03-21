@@ -15,7 +15,6 @@ public class FtpClient {
 
     public static final String HOST = "127.0.0.1";
     public static  String currentDirectory = System.getProperty("user.dir") + "/client_folder/";
-    private static final String ack = "ACK";
 
     private static DataInputStream inputStream;
     private static DataOutputStream outputStream;

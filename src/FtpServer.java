@@ -68,7 +68,7 @@ public class FtpServer {
     }
 
     private static void PWD() throws IOException {
-        outputStream.writeUTF(currentDirectory);
+        outputStream.writeUTF(System.getProperty("user.dir"));
     }
 
     private static void LS(String dir) throws IOException {
