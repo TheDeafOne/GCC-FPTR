@@ -1,7 +1,7 @@
 /** Author:  Brayden Stuchell, Keegan Woodburn
  * Course:  COMP 342 Data Communications and Networking
  * Date:    16 March 2022
- * Description: put a description here
+ * Description: A simple FTP client that allows users to upload and download files, list files, and get the current working directory.
  */
 
 import java.io.*;

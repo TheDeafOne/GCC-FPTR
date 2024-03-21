@@ -1,3 +1,9 @@
+/** Author:  Brayden Stuchell, Keegan Woodburn
+ * Course:  COMP 342 Data Communications and Networking
+ * Date:    16 March 2022
+ * Description: Utility class for FTP server and client.
+ */
+
 import java.io.*;
 
 public class Utils {
