@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 public class FtpClient {
     public static final int PORT = 9001;
-
     public static final String HOST = "127.0.0.1";
     public static  String currentDirectory = System.getProperty("user.dir") + "/client_folder/";
     private static DataInputStream inputStream;
@@ -21,9 +20,11 @@ public class FtpClient {
     public static void main(String[] args) {
         Scanner scnr = new Scanner(System.in);
         try {
+            // create socket and connect to server
             Socket socket = new Socket(HOST, PORT);
             System.out.println("Welcome to GCC FTP client!");
 
+            // initialize input and output streams
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream = new DataOutputStream(socket.getOutputStream());
             while (true) {
@@ -53,8 +54,14 @@ public class FtpClient {
         }
     }
 
+    /**
+     * Sends file to server
+     * @param filename - name of file to send
+     * @throws IOException - if there is an error reading bytes
+     */
     private static void PUT(String filename) throws IOException {
         try {
+            // read file bytes and send to server
             Path path = Path.of(currentDirectory + filename);
             byte[] fileBytes = Files.readAllBytes(path);
             outputStream.writeUTF(Utils.ACK);
@@ -63,18 +70,25 @@ public class FtpClient {
             outputStream.write(fileBytes, 0, fileBytes.length); // send file bytes
             System.out.println("Uploaded " + filename + " successfully");
         } catch (Exception e) {
+            // send client exception to server
             outputStream.writeUTF("Client Exception");
             System.out.println("There was an error reading the file or the file does not exist.");
         }
     }
 
+    /**
+     * Receives file from server and writes to client
+     * @param data - name of file to get
+     * @throws IOException - if there is an error reading bytes
+     */
     private static void GET(String data) throws IOException {
-        System.out.println(data);
+        // send file name to server that we want to get
         String ack = inputStream.readUTF();
         if (!ack.equals(Utils.ACK)) {
             System.out.println("The file " + data + " does not exist.");
             return;
         }
+        // get file bytes and write to file
         int n = inputStream.readInt();
         byte[] fileBytes = Utils.readBytes(inputStream, n);
         try (FileOutputStream fos = new FileOutputStream(currentDirectory + data)) {
@@ -85,12 +99,22 @@ public class FtpClient {
         System.out.println("Downloaded " + data + " correctly");
     }
 
+    /**
+     * Sends PWD command to server and prints out the received current directory
+     * @throws IOException - if there is an error reading bytes
+     */
     private static void PWD() throws IOException {
+        // get current directory
         String response = inputStream.readUTF();
         System.out.println(response);
     }
 
+    /**
+     * Sends LS command to server and prints out the received list of files in the current directory
+     * @throws IOException - if there is an error reading bytes
+     */
     private static void LS() throws IOException {
+        // get number of files, then read and print out each file name
         int n = inputStream.readInt();
         for (int i = 0; i < n; i++) {
             System.out.println(inputStream.readUTF());

@@ -9,6 +9,13 @@ import java.io.*;
 public class Utils {
     public static final String ACK = "ACK";
 
+    /**
+     * Send bytes to output stream
+     * @param in - input stream
+     * @param n - number of bytes to read
+     * @return - byte array
+     * @throws IOException - if there is an error reading bytes
+     */
     public static byte[] readBytes(DataInputStream in, int n) throws IOException {
         byte[] buffer = new byte[n];
         int numberOfBytesRead = 0;
